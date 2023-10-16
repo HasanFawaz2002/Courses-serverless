@@ -1,0 +1,48 @@
+import {
+    DynamoDBClient,
+    ScanCommand,
+    ScanCommandInput,
+} from "@aws-sdk/client-dynamodb";
+
+const dynamoDB = new DynamoDBClient({ region: 'us-east-1' });
+const tableName = 'CourseTable';
+
+export const getAllCourses = async () => {
+    try {
+        const scanParams: ScanCommandInput = {
+            TableName: tableName,
+        };
+
+        const scanResults = await dynamoDB.send(new ScanCommand(scanParams));
+
+        if (scanResults.Items && scanResults.Items.length > 0) {
+            return {
+                statusCode: 200,
+                body: JSON.stringify(scanResults.Items),
+                headers: {
+                    'Access-Control-Allow-Origin': 'http://localhost:5173',
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                },
+            };
+        } else {
+            return {
+                statusCode: 204,
+                body: JSON.stringify({ message: "No courses found" }),
+                headers: {
+                    'Access-Control-Allow-Origin': 'http://localhost:5173',
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                },
+            };
+        }
+    } catch (error) {
+        console.error("Error getting all courses:", error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: "Internal Server Error" }),
+            headers: {
+                'Access-Control-Allow-Origin': 'http://localhost:5173',
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            },
+        };
+    }
+};
