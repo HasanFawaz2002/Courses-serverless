@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { v4 } from 'uuid';
-import * as yup from 'yup';
+
+import {schema} from '../Schema';
 
 import {
     DynamoDBClient,
@@ -8,11 +9,7 @@ import {
     PutItemCommandInput,
 } from "@aws-sdk/client-dynamodb";
 
-const schema = yup.object().shape({
-    name: yup.string().required(),
-    description: yup.string().required(),
-    credit: yup.number().required(),
-})
+
 
 const dynamoDB = new DynamoDBClient({ region: 'us-east-1' });
 const tableName = 'CourseTable';
@@ -32,7 +29,7 @@ export const createCourse = async (event: APIGatewayProxyEvent): Promise<APIGate
                 statusCode: 400,
                 body: JSON.stringify({ error: validationError.errors }),
                 headers: {
-                    'Access-Control-Allow-Origin': 'http://localhost:5173',
+                    'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 },
             };
@@ -56,19 +53,33 @@ export const createCourse = async (event: APIGatewayProxyEvent): Promise<APIGate
             statusCode: 200,
             body: JSON.stringify(course),
             headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:5173',
+                'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
             },
         };
     } catch (error) {
         console.error("Error creating course:", error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: "Internal Server Error" }),
-            headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:5173',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            },
-        };
+
+        if (error.code === 'UnauthorizedException' || error.code === 'AccessDeniedException') {
+            
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ error: "Unauthorized" }),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                },
+            };
+        } else {
+            
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: "Internal Server Error" }),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                },
+            };
+        }
     }
 };

@@ -1,12 +1,6 @@
 import { DynamoDBClient, PutItemCommand, PutItemCommandInput } from "@aws-sdk/client-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import * as yup from 'yup';
-
-const schema = yup.object().shape({
-    name: yup.string(),
-    description: yup.string(),
-    credit: yup.number(),
-});
+import {schema} from '../Schema';
 
 const dynamoDB = new DynamoDBClient({ region: 'us-east-1' });
 const tableName = 'CourseTable';
@@ -24,8 +18,9 @@ export const updateCourseById = async (event: APIGatewayProxyEvent): Promise<API
                 statusCode: 400,
                 body: JSON.stringify({ error: validationError.errors }),
                 headers: {
-                    'Access-Control-Allow-Origin': 'http://localhost:5173',
+                    'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Credentials': true
                 },
             };
         }
@@ -51,24 +46,54 @@ export const updateCourseById = async (event: APIGatewayProxyEvent): Promise<API
             Item: item,
         };
 
-        const putResult = await dynamoDB.send(new PutItemCommand(putItemParams));
+        try {
+            const putResult = await dynamoDB.send(new PutItemCommand(putItemParams));
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ message: "Item updated successfully" ,response:putResult}),
-            headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:5173',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            },
-        };
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ message: "Item updated successfully", response: putResult }),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Credentials': true
+                },
+            };
+        } catch (error) {
+            console.error("Error updating course by ID:", error);
+
+            if (error.code === 'UnauthorizedException' || error.code === 'AccessDeniedException') {
+                
+                return {
+                    statusCode: 401,
+                    body: JSON.stringify({ error: "Unauthorized" }),
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                        'Access-Control-Allow-Credentials': true
+                    },
+                };
+            } else {
+                
+                return {
+                    statusCode: 500,
+                    body: JSON.stringify({ error: "Internal Server Error" }),
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                        'Access-Control-Allow-Credentials': true
+                    },
+                };
+            }
+        }
     } catch (error) {
         console.error("Error updating course by ID:", error);
         return {
             statusCode: 500,
             body: JSON.stringify({ error: "Internal Server Error" }),
             headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:5173',
+                'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Credentials': true
             },
         };
     }

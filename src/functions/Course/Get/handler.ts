@@ -22,8 +22,9 @@ export const getCourseById = async (event: APIGatewayProxyEvent): Promise<APIGat
                 statusCode: 200,
                 body: JSON.stringify(getItemResult.Item),
                 headers: {
-                    'Access-Control-Allow-Origin': 'http://localhost:5173',
+                    'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Credentials': true
                 },
             };
         } else {
@@ -31,8 +32,9 @@ export const getCourseById = async (event: APIGatewayProxyEvent): Promise<APIGat
                 statusCode: 404, 
                 body: JSON.stringify({ message: "Course not found" }),
                 headers: {
-                    'Access-Control-Allow-Origin': 'http://localhost:5173',
+                    'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Credentials': true
                 },
             };
         }
@@ -42,8 +44,9 @@ export const getCourseById = async (event: APIGatewayProxyEvent): Promise<APIGat
             statusCode: 500,
             body: JSON.stringify({ error: "Internal Server Error" }),
             headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:5173',
+                'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Credentials': true
             },
         };
     }

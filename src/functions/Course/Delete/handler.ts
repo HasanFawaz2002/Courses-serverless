@@ -19,21 +19,38 @@ export const deleteCourseById = async (event: APIGatewayProxyEvent): Promise<API
 
         return {
             statusCode: 204, 
-            body:JSON.stringify({ error: "Course Deleted Successfully" }),
+            body: JSON.stringify({ message: "Course Deleted Successfully" }),
             headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:5173',
+                'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Credentials': true
             },
         };
     } catch (error) {
         console.error("Error deleting course by ID:", error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: "Internal Server Error" }),
-            headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:5173',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            },
-        };
+
+        if (error.code === 'UnauthorizedException' || error.code === 'AccessDeniedException') {
+            
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ error: "Unauthorized" }),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Credentials': true
+                },
+            };
+        } else {
+            
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: "Internal Server Error" }),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Credentials': true
+                },
+            };
+        }
     }
 };

@@ -20,7 +20,7 @@ export const getAllCourses = async () => {
                 statusCode: 200,
                 body: JSON.stringify(scanResults.Items),
                 headers: {
-                    'Access-Control-Allow-Origin': 'http://localhost:5173',
+                    'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 },
             };
@@ -29,20 +29,34 @@ export const getAllCourses = async () => {
                 statusCode: 204,
                 body: JSON.stringify({ message: "No courses found" }),
                 headers: {
-                    'Access-Control-Allow-Origin': 'http://localhost:5173',
+                    'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 },
             };
         }
     } catch (error) {
         console.error("Error getting all courses:", error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: "Internal Server Error" }),
-            headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:5173',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            },
-        };
+
+        if (error.code === 'UnauthorizedException' || error.code === 'AccessDeniedException') {
+            
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ error: "Unauthorized" }),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                },
+            };
+        } else {
+            
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: "Internal Server Error" }),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                },
+            };
+        }
     }
 };
