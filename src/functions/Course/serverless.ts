@@ -1,14 +1,14 @@
 import type { AWS } from '@serverless/typescript';
 
-import createCourse from './src/functions/Course/Create/index';
-import deleteCourseById from './src/functions/Course/Delete/index';
-import getCourseById from './src/functions/Course/Get/index';
-import getAllCourses from './src/functions/Course/GetAll/index';
-import updateCourseById from './src/functions/Course/Update/index';
+import createCourse from './Create/index';
+import deleteCourseById from './Delete/index';
+import getCourseById from './Get/index';
+import getAllCourses from './GetAll/index';
+import updateCourseById from './Update/index';
 
 
 const serverlessConfiguration: AWS = {
-  service: 'courses-Global-back',
+  service: 'Course-back',
   frameworkVersion: '3',
   plugins: ['serverless-esbuild'],
   provider: {
@@ -35,16 +35,7 @@ const serverlessConfiguration: AWS = {
         ],
         Resource: { 'Fn::GetAtt': ['CourseTable', 'Arn'] },
       },
-      {
-        Effect: 'Allow',
-        Action: [
-          'dynamodb:GetItem',
-          'dynamodb:PutItem',
-          'dynamodb:Scan',
-          'dynamodb:DeleteItem',
-        ],
-        Resource: { 'Fn::GetAtt': ['UsersCourseTable', 'Arn'] },
-      },
+      
     ],
 
 
@@ -90,34 +81,9 @@ const serverlessConfiguration: AWS = {
           ],
         },
       },
-
-      UsersCourseTable: {
-        Type: 'AWS::DynamoDB::Table',
-        Properties: {
-          TableName: 'UsersCourseTable',  
-          ProvisionedThroughput: {
-            ReadCapacityUnits: 1,  
-            WriteCapacityUnits: 1, 
-          },
-          AttributeDefinitions: [
-            {
-              AttributeName: 'UserId', 
-              AttributeType: 'S', 
-            },
-            
-          ],
-          KeySchema: [
-            {
-              AttributeName: 'UserId', 
-              KeyType: 'HASH', 
-            },
-            
-          ],
-        },
-      },
-
-      
     },
+
+
   },
 
 

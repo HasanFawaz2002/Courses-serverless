@@ -7,7 +7,7 @@ export default {
       http: {
         method: 'post',
         path: '/createCourse',
-        
+        cors: true,
       },
     },
   ],

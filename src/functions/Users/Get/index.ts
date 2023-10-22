@@ -1,12 +1,12 @@
 import { handlerPath } from '@libs/handler-resolver';
 
 export default {
-  handler: `${handlerPath(__dirname)}/handler.deleteCourseById`,
+  handler: `${handlerPath(__dirname)}/handler.getUserById`,
   events: [
     {
       http: {
-        method: 'delete',
-        path: '/deleteCourseById/{CourseID}',
+        method: 'get',
+        path: '/getUserById/{UserId}',
         cors: true,
       },
     },

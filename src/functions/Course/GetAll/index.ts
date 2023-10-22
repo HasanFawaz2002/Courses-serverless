@@ -7,7 +7,7 @@ export default {
       http: {
         method: 'get',
         path: '/getAllCourses',
-        
+        cors: true,
       },
     },
   ],

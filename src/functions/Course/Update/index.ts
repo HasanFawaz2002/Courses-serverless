@@ -7,7 +7,7 @@ export default {
       http: {
         method: 'put',
         path: '/updateCourseById/{CourseID}',
-        
+        cors: true,
       },
     },
   ],
